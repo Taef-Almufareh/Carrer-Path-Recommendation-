@@ -46,7 +46,7 @@ if file:
     machine_learning = st.slider("Machine Learning", 40,100,75)
     security = st.slider("Security", 40,100,60)
 
- if st.button("Recommend"):
+    if st.button("Recommend"):
         new_data = pd.DataFrame([{
             "programming":programming,
             "algorithms":algorithms,
@@ -66,4 +66,3 @@ if file:
         career = label_encoder.inverse_transform([pred])[0]
 
         st.success(f"Recommended Career: {career}")
-
