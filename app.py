@@ -46,23 +46,35 @@ if file:
     machine_learning = st.slider("Machine Learning", 40,100,75)
     security = st.slider("Security", 40,100,60)
 
-    if st.button("Recommend"):
-        new_data = pd.DataFrame([{
-            "programming":programming,
-            "algorithms":algorithms,
-            "databases":databases,
-            "networks":networks,
-            "software_engineering":software_engineering,
-            "machine_learning":machine_learning,
-            "security":security
-        }])
 
-        new_data = pd.get_dummies(new_data)
-        new_data = new_data.reindex(columns=X_encoded.columns, fill_value=0)
 
-        new_scaled = scaler.transform(new_data)
+if st.button("Recommend"):
+    new_data = pd.DataFrame([{
+        "programming":programming,
+        "algorithms":algorithms,
+        "databases":databases,
+        "networks":networks,
+        "software_engineering":software_engineering,
+        "machine_learning":machine_learning,
+        "security":security
+    }])
 
-        pred = model.predict(new_scaled)[0]
-        career = label_encoder.inverse_transform([pred])[0]
+    new_data = pd.get_dummies(new_data)
+    new_data = new_data.reindex(columns=X_encoded.columns, fill_value=0)
 
-        st.success(f"Recommended Career: {career}")
+    new_scaled = scaler.transform(new_data)
+
+    # 🔥 Get probability for all careers
+    probs = model.predict_proba(new_scaled)[0]
+
+    # 🔥 Get top 3 indices
+    top_3_idx = np.argsort(probs)[-3:][::-1]
+
+    # 🔥 Convert to career names
+    top_3_careers = label_encoder.inverse_transform(top_3_idx)
+    top_3_scores = probs[top_3_idx]
+
+    st.success("Top 3 Recommended Careers:")
+
+    for i in range(3):
+        st.write(f"{i+1}. {top_3_careers[i]} — Confidence: {top_3_scores[i]:.2f}")
